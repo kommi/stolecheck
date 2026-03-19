@@ -1,0 +1,164 @@
+{
+  "project_name": "StoleCheck",
+  "identity": {
+    "core_concept": "Tactical Security Command Center",
+    "emotional_tone": "Authoritative, Trustworthy, Precision, Alertness",
+    "visual_archetype": "The Performance Pro (Dark Mode Variant)",
+    "description": "A high-contrast, dark-mode-first platform that feels like a law enforcement tool rather than a consumer app. It emphasizes data clarity, rapid identification, and security."
+  },
+  "typography": {
+    "fonts": {
+      "heading": {
+        "family": "Chivo",
+        "fallback": "sans-serif",
+        "weights": ["900", "700"],
+        "usage": "Use for all H1-H3 headings. Tracking tight (-0.02em). Uppercase for H6 labels."
+      },
+      "body": {
+        "family": "Manrope",
+        "fallback": "sans-serif",
+        "weights": ["400", "500", "600"],
+        "usage": "Primary UI text. optimized for legibility at small sizes."
+      },
+      "mono": {
+        "family": "JetBrains Mono",
+        "fallback": "monospace",
+        "weights": ["400"],
+        "usage": "Use for TPS Scores, Serial Numbers, IP addresses, and tabular data."
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-6xl font-black tracking-tight",
+      "h2": "text-3xl md:text-5xl font-bold tracking-tight",
+      "h3": "text-2xl md:text-3xl font-bold",
+      "p": "text-base md:text-lg leading-relaxed text-muted-foreground",
+      "label": "text-xs font-bold uppercase tracking-widest text-muted-foreground"
+    }
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": {
+        "default": "#020408", 
+        "paper": "#0B0D12", 
+        "overlay": "#161920"
+      },
+      "primary": {
+        "main": "#3B82F6",
+        "hover": "#2563EB",
+        "foreground": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#1E293B",
+        "foreground": "#E2E8F0"
+      },
+      "status": {
+        "safe": "#10B981", 
+        "warning": "#F59E0B", 
+        "danger": "#EF4444", 
+        "neutral": "#64748B"
+      },
+      "text": {
+        "primary": "#F8FAFC",
+        "secondary": "#94A3B8",
+        "muted": "#475569"
+      },
+      "border": {
+        "default": "#1E293B",
+        "active": "#3B82F6"
+      }
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, rgba(2, 4, 8, 0) 70%)",
+      "card_surface": "linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)"
+    }
+  },
+  "spacing_and_layout": {
+    "spacing_scale": "p-1, p-2, p-4, p-6, p-8, p-12, p-16, p-24, p-32",
+    "grid_system": {
+      "marketing": "Grid-cols-12 with gap-8. Asymmetrical bento grid for features.",
+      "dashboard": "Grid-cols-4 (Desktop) / Grid-cols-1 (Mobile). Dense packing.",
+      "law_enforcement": "Full-width fluid containers. Map taking 100% height where applicable."
+    },
+    "container_padding": "px-6 md:px-12 lg:px-20"
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.5)] rounded-sm font-bold uppercase tracking-wide",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm font-medium",
+      "destructive": "bg-red-900/50 text-red-200 border border-red-900 hover:bg-red-900/80"
+    },
+    "cards": {
+      "default": "bg-card/50 backdrop-blur-md border border-white/5 rounded-lg shadow-xl",
+      "interactive": "hover:border-primary/50 transition-colors duration-300 cursor-pointer group",
+      "tps_score": "relative overflow-hidden rounded-full border-4 flex items-center justify-center font-mono font-bold"
+    },
+    "inputs": {
+      "default": "bg-background border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-md"
+    },
+    "visual_enhancers": {
+      "glassmorphism": "bg-black/40 backdrop-blur-xl border border-white/10",
+      "grid_lines": "bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]",
+      "scan_line": "absolute w-full h-[2px] bg-primary/50 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-scan-vertical"
+    }
+  },
+  "image_urls": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1662638600476-d563fffbb072?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "Dark cyber command center with multiple screens. Use as background for Hero section with heavy overlay."
+    },
+    "law_enforcement_context": {
+      "url": "https://images.unsplash.com/photo-1636588663634-fd6adbe57e71?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "Police officer at night. Use for 'For Law Enforcement' section."
+    },
+    "register_items": {
+      "url": "https://images.unsplash.com/photo-1619943927316-5e1d83ecef0c?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "High value electronics (MacBook, iPhone, Camera). Use for 'Protect Your Valuables' section."
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "Stroke width 1.5px (Thin/Tech feel)",
+    "recommendations": {
+      "dashboard": "LayoutDashboard",
+      "search": "ScanSearch",
+      "alert": "Siren",
+      "police": "ShieldAlert",
+      "user": "UserCircle2",
+      "item": "PackageSearch",
+      "analytics": "Activity"
+    }
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-out",
+    "hover_effects": "translate-y-[-2px] shadow-lg",
+    "loading": "Use a radar-sweep animation or a digital decoding text effect."
+  },
+  "accessibility": {
+    "contrast": "Ensure text is always #F8FAFC on dark backgrounds. Avoid dark grey on black.",
+    "focus_states": "Visible ring-2 ring-primary ring-offset-2 ring-offset-background"
+  },
+  "instructions_to_main_agent": {
+    "general": "You are building a high-trust, authoritative security platform. Do not make it look like a playful startup. It should feel like 'The Batcomputer' or a SOC (Security Operations Center).",
+    "theme_setup": "Force Dark Mode by default. Do not implement a light mode unless absolutely necessary for accessibility toggles. Set 'class' mode in tailwind but default to dark variables.",
+    "dashboard_layout": "Use a fixed sidebar (left) and a top header. The main content area should be scrollable. Use 'Card' components for every widget.",
+    "tps_logic": "When displaying Theft Probability Score (TPS), use color coding: 0-30 (Green/Safe), 31-70 (Amber/Suspicious), 71-100 (Red/Stolen).",
+    "maps": "If implementing maps, use a dark-themed map style (e.g., CartoDB Dark Matter) to match the UI.",
+    "charts": "Use Recharts. Style the lines/bars with thin strokes and neon colors."
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic outputs. Avoid this. Make it distinctive.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for overlays and floating panels.",
+    "You MUST NOT apply universal transition (e.g., transition: all).",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles (sharp or slightly rounded) with interaction animations.",
+    "NEVER use AI assistant Emoji characters like 🤖 for icons. Use Lucide icons.",
+    "Every interaction needs micro-animations (hover states, focus states).",
+    "Use 'sonner' for toasts.",
+    "Prioritize using pre-existing components from src/components/ui.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports."
+  ]
+}
