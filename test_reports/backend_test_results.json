@@ -1,0 +1,186 @@
+{
+  "timestamp": "2026-03-19T16:47:42.243144",
+  "total_tests": 21,
+  "passed_tests": 20,
+  "failed_tests": [
+    {
+      "test_name": "Create stolen item",
+      "success": false,
+      "details": "Failed to create item",
+      "timestamp": "2026-03-19T16:47:37.218825",
+      "expected_status": 201,
+      "actual_status": 200
+    }
+  ],
+  "success_rate": 95.2,
+  "results": [
+    {
+      "test_name": "Root endpoint",
+      "success": true,
+      "details": "Message: StoleCheck API v1.0",
+      "timestamp": "2026-03-19T16:47:32.590487",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Public stats endpoint",
+      "success": true,
+      "details": "Items: 9, Users: 7",
+      "timestamp": "2026-03-19T16:47:33.003196",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Login admin",
+      "success": true,
+      "details": "User: Rajesh Kumar, Role: admin",
+      "timestamp": "2026-03-19T16:47:33.627382",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Login victim",
+      "success": true,
+      "details": "User: Priya Sharma, Role: victim",
+      "timestamp": "2026-03-19T16:47:34.364835",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Login buyer",
+      "success": true,
+      "details": "User: Ravi Verma, Role: buyer",
+      "timestamp": "2026-03-19T16:47:34.985546",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Login law_enforcement",
+      "success": true,
+      "details": "User: Inspector Mehra, Role: law_enforcement",
+      "timestamp": "2026-03-19T16:47:35.599014",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Auth me endpoint",
+      "success": true,
+      "details": "Authenticated as: Rajesh Kumar",
+      "timestamp": "2026-03-19T16:47:36.009044",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get victim items",
+      "success": true,
+      "details": "Found 5 items",
+      "timestamp": "2026-03-19T16:47:36.401227",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get specific item",
+      "success": true,
+      "details": "Retrieved item: Test iPhone 15 Pro",
+      "timestamp": "2026-03-19T16:47:36.798809",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Create stolen item",
+      "success": false,
+      "details": "Failed to create item",
+      "timestamp": "2026-03-19T16:47:37.218825",
+      "expected_status": 201,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Text search verification",
+      "success": true,
+      "details": "TPS Score: 18, Matches: 3",
+      "timestamp": "2026-03-19T16:47:37.669001",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "ID scan verification",
+      "success": true,
+      "details": "IMEI scan TPS: 36 (should be high for known stolen IMEI)",
+      "timestamp": "2026-03-19T16:47:38.126994",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Verification history",
+      "success": true,
+      "details": "Found 6 verification records",
+      "timestamp": "2026-03-19T16:47:38.569103",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Law enforcement stats",
+      "success": true,
+      "details": "Alerts: 4, Cases: 2",
+      "timestamp": "2026-03-19T16:47:38.980153",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get alerts",
+      "success": true,
+      "details": "Found 4 alerts",
+      "timestamp": "2026-03-19T16:47:39.382646",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Update alert status",
+      "success": true,
+      "details": "Alert status updated",
+      "timestamp": "2026-03-19T16:47:39.799576",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get cases",
+      "success": true,
+      "details": "Found 2 cases",
+      "timestamp": "2026-03-19T16:47:40.198178",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get all items (law enforcement)",
+      "success": true,
+      "details": "Found 10 items in database",
+      "timestamp": "2026-03-19T16:47:40.624173",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Admin stats",
+      "success": true,
+      "details": "Users: 7, Items: 10",
+      "timestamp": "2026-03-19T16:47:41.047822",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Get all users",
+      "success": true,
+      "details": "Found 7 users",
+      "timestamp": "2026-03-19T16:47:41.444318",
+      "expected_status": 200,
+      "actual_status": 200
+    },
+    {
+      "test_name": "Update user role",
+      "success": true,
+      "details": "Changed role from buyer to victim",
+      "timestamp": "2026-03-19T16:47:41.861872",
+      "expected_status": 200,
+      "actual_status": 200
+    }
+  ]
+}

@@ -1,34 +1,53 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* StoleCheck Global Styles */
+.tps-safe { color: #10B981; }
+.tps-suspicious { color: #F59E0B; }
+.tps-stolen { color: #EF4444; }
+
+.tps-bg-safe { background-color: rgba(16, 185, 129, 0.15); border-color: #10B981; }
+.tps-bg-suspicious { background-color: rgba(245, 158, 11, 0.15); border-color: #F59E0B; }
+.tps-bg-stolen { background-color: rgba(239, 68, 68, 0.15); border-color: #EF4444; }
+
+.tps-ring-safe { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3); }
+.tps-ring-suspicious { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3); }
+.tps-ring-stolen { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3); }
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94A3B8;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.sidebar-link:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #F8FAFC;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.sidebar-link.active {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3B82F6;
+  border-left: 2px solid #3B82F6;
 }
 
-.App-link {
-    color: #61dafb;
+.hero-glow {
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, rgba(2, 4, 8, 0) 70%);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.category-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
+
+.category-jewellery { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+.category-vehicle { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.category-electronics { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; }
+.category-other { background: rgba(100, 116, 139, 0.15); color: #94A3B8; }

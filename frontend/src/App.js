@@ -1,53 +1,115 @@
-import { useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { Toaster } from "sonner";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Layout from "@/components/Layout";
+import LandingPage from "@/pages/LandingPage";
+import AuthPage from "@/pages/AuthPage";
+import AuthCallback from "@/pages/AuthCallback";
+import VictimDashboard from "@/pages/VictimDashboard";
+import BuyerVerification from "@/pages/BuyerVerification";
+import LawEnforcementDashboard from "@/pages/LawEnforcementDashboard";
+import AdminPanel from "@/pages/AdminPanel";
+import LawAlerts from "@/pages/LawAlerts";
+import LawCases from "@/pages/LawCases";
+import LawItems from "@/pages/LawItems";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+function DashboardRouter() {
+  const { user } = useAuth();
+  if (!user) return null;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+  switch (user.role) {
+    case 'law_enforcement':
+      return <LawEnforcementDashboard />;
+    case 'admin':
+      return <AdminPanel />;
+    case 'buyer':
+      return <BuyerVerification />;
+    default:
+      return <VictimDashboard />;
+  }
+}
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+function AppRouter() {
+  const location = useLocation();
+
+  // Check URL fragment for session_id - detect DURING RENDER, not in useEffect
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Layout><DashboardRouter /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/verify" element={
+        <ProtectedRoute>
+          <Layout><BuyerVerification /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/law/alerts" element={
+        <ProtectedRoute roles={['law_enforcement', 'admin']}>
+          <Layout><LawAlerts /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/law/cases" element={
+        <ProtectedRoute roles={['law_enforcement', 'admin']}>
+          <Layout><LawCases /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/law/items" element={
+        <ProtectedRoute roles={['law_enforcement', 'admin']}>
+          <Layout><LawItems /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin/users" element={
+        <ProtectedRoute roles={['admin']}>
+          <Layout><AdminPanel /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin/analytics" element={
+        <ProtectedRoute roles={['admin']}>
+          <Layout><AdminPanel /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
-};
+}
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRouter />
+        <Toaster
+          position="top-right"
+          theme="dark"
+          toastOptions={{
+            style: {
+              background: '#0B0D12',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#F8FAFC',
+            },
+          }}
+        />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
