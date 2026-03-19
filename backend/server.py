@@ -158,7 +158,7 @@ async def logout(request: Request, response: Response):
 
 # =================== STOLEN ITEMS ROUTES ===================
 
-@api_router.post("/items", response_model=StolenItemResponse)
+@api_router.post("/items", response_model=StolenItemResponse, status_code=201)
 async def create_stolen_item(data: StolenItemCreate, request: Request):
     user = await get_current_user(request, db)
     item_id = f"item_{uuid.uuid4().hex[:12]}"
@@ -313,14 +313,21 @@ async def verify_item(data: VerificationRequest, request: Request):
             ids = item.get("unique_identifiers", {})
             for key, val in ids.items():
                 if val and id_val in str(val).upper():
-                    confidence = 100 if id_val == str(val).upper() else 70
+                    is_exact = id_val == str(val).upper()
+                    confidence = 100 if is_exact else 70
                     id_confidence = max(id_confidence, confidence / 100.0)
+                    # Exact ID match is strong evidence - boost metadata and contextual scores
+                    if is_exact:
+                        metadata_match = max(metadata_match, 0.8)
+                        contextual_risk = max(contextual_risk, 0.9)
+                    else:
+                        metadata_match = max(metadata_match, 0.4)
                     matched_items.append({
                         "scid": item.get("scid", ""),
                         "title": item.get("title", ""),
                         "category": item.get("category", ""),
                         "confidence": confidence,
-                        "reason": f"ID match on {key}: {val}",
+                        "reason": f"{'Exact' if is_exact else 'Partial'} ID match on {key}: {val}",
                     })
         
         ai_analysis = f"ID scan completed. Searched for {id_type}: {id_val}"
@@ -354,9 +361,10 @@ async def verify_item(data: VerificationRequest, request: Request):
         matched_items = matched_items[:10]
         ai_analysis = f"Text search completed for: {data.search_text}"
 
-    # Calculate contextual risk
+    # Calculate contextual risk (only boost, don't reduce previously set values)
     if matched_items:
-        contextual_risk = min(0.5, len(matched_items) * 0.1)
+        general_risk = min(0.5, len(matched_items) * 0.1)
+        contextual_risk = max(contextual_risk, general_risk)
 
     tps = calculate_tps(visual_sim, id_confidence, metadata_match, contextual_risk)
     tps["matched_items"] = matched_items

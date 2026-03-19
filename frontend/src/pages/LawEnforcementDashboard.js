@@ -73,12 +73,12 @@ export default function LawEnforcementDashboard() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-white/10">
+      <div className="flex gap-1 mb-6 border-b border-white/10 relative z-10">
         {['overview', 'alerts', 'cases'].map((t) => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
-            className={`px-4 py-2.5 text-sm font-semibold capitalize transition-colors ${
+            className={`px-4 py-2.5 text-sm font-semibold capitalize transition-colors relative ${
               activeTab === t ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'
             }`}
             data-testid={`leo-tab-${t}`}

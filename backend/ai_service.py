@@ -164,6 +164,11 @@ def calculate_tps(visual_sim: float, id_confidence: float, metadata_match: float
         (metadata_match * 15) +
         (contextual_risk * 10)
     )
+
+    # Exact ID match override: an exact IMEI/VIN/serial match is near-certain proof
+    if id_confidence >= 1.0:
+        tps = max(tps, 88)
+
     tps = max(0, min(100, tps))
 
     if tps <= 30:
