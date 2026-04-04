@@ -63,6 +63,7 @@ export const lawAPI = {
   updateCase: (id, data) => api.patch(`/law/cases/${id}`, data),
   getStats: () => api.get('/law/stats'),
   getItems: (params) => api.get('/law/items', { params }),
+  getItemDetail: (id) => api.get(`/law/items/${id}`),
 };
 
 // Admin

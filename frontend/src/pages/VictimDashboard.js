@@ -116,12 +116,20 @@ export default function VictimDashboard() {
             <div
               key={item.item_id}
               onClick={() => setSelectedItem(item)}
-              className="glass-panel rounded-lg p-5 hover:border-primary/30 transition-colors duration-300 cursor-pointer group"
+              className="glass-panel rounded-lg overflow-hidden hover:border-primary/30 transition-colors duration-300 cursor-pointer group"
               data-testid={`item-card-${item.item_id}`}
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+              <div className="flex">
+                {/* Thumbnail */}
+                <div className="w-20 h-20 md:w-28 md:h-28 shrink-0 bg-black/30 flex items-center justify-center border-r border-white/5">
+                  {item.images && item.images.length > 0 ? (
+                    <img src={`data:image/jpeg;base64,${item.images[0]}`} alt={item.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-8 h-8 text-muted-foreground/20" />
+                  )}
+                </div>
+                <div className="flex-1 p-4">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-mono text-xs text-primary/70">{item.scid}</span>
                     <CategoryBadge category={item.category} />
                     <StatusBadge status={item.status} />
@@ -135,7 +143,7 @@ export default function VictimDashboard() {
                   </div>
                 </div>
                 {item.fir_number && (
-                  <div className="text-right shrink-0">
+                  <div className="hidden md:flex flex-col items-end justify-center px-4">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">FIR</p>
                     <p className="font-mono text-xs text-foreground/70">{item.fir_number}</p>
                   </div>
@@ -354,6 +362,20 @@ function ItemDetailDialog({ item, onClose, onUpdated }) {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {/* Images */}
+          {item.images && item.images.length > 0 && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Photos ({item.images.length})</p>
+              <div className="grid grid-cols-2 gap-2">
+                {item.images.map((img, i) => (
+                  <div key={i} className="rounded-lg overflow-hidden border border-white/10 bg-black/30">
+                    <img src={`data:image/jpeg;base64,${img}`} alt={`Photo ${i+1}`} className="w-full max-h-48 object-contain" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <h3 className="text-xl font-bold">{item.title}</h3>
           <p className="text-sm text-muted-foreground">{item.description}</p>
 

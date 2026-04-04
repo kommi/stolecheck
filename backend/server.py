@@ -19,7 +19,7 @@ from auth import (
     hash_password, verify_password, create_token,
     get_current_user, exchange_session_id,
 )
-from ai_service import analyze_item_image, compare_images, calculate_tps
+from ai_service import analyze_item_image, compare_images_real, calculate_tps
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -230,7 +230,7 @@ async def get_stolen_items(request: Request, category: Optional[str] = None, sta
 
 @api_router.get("/items/{item_id}")
 async def get_item(item_id: str, request: Request):
-    user = await get_current_user(request, db)
+    await get_current_user(request, db)
     item = await db.stolen_items.find_one({"item_id": item_id}, {"_id": 0, "ai_analysis": 0})
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
@@ -278,23 +278,43 @@ async def verify_item(data: VerificationRequest, request: Request):
     ai_analysis = ""
 
     if data.search_type == "photo" and data.image_base64:
-        # Photo-based scan - use AI
+        # Photo-based scan - use AI with REAL image comparison
         query = {}
         if data.category:
             query["category"] = data.category
         query["status"] = "active"
-        stored_items = await db.stolen_items.find(query, {"_id": 0, "ai_analysis": 0}).to_list(50)
+        # IMPORTANT: Include images for real visual comparison
+        stored_items = await db.stolen_items.find(query, {"_id": 0}).sort("created_at", -1).to_list(50)
         
         if stored_items:
-            result = await compare_images(data.image_base64, stored_items)
+            result = await compare_images_real(data.image_base64, stored_items)
             visual_sim = result.get("visual_similarity", 0.0)
             ai_analysis = result.get("ai_analysis", "")
             for m in result.get("matched_items", []):
-                matched_items.append({
-                    "scid": m.get("scid", ""),
+                # Enrich matched item with full details from DB
+                scid = m.get("scid", "")
+                stored = next((i for i in stored_items if i.get("scid") == scid), None)
+                match_entry = {
+                    "scid": scid,
                     "confidence": m.get("confidence", 0),
                     "reason": m.get("reason", ""),
-                })
+                }
+                if stored:
+                    match_entry["title"] = stored.get("title", "")
+                    match_entry["category"] = stored.get("category", "")
+                    match_entry["brand"] = stored.get("brand", "")
+                    match_entry["model"] = stored.get("model", "")
+                    match_entry["color"] = stored.get("color", "")
+                    match_entry["description"] = stored.get("description", "")
+                    match_entry["distinguishing_marks"] = stored.get("distinguishing_marks", "")
+                    match_entry["estimated_value"] = stored.get("estimated_value")
+                    match_entry["theft_location"] = stored.get("theft_location", "")
+                    match_entry["theft_date"] = stored.get("theft_date", "")
+                    match_entry["fir_number"] = stored.get("fir_number", "")
+                    # Include first image for side-by-side comparison
+                    if stored.get("images") and len(stored["images"]) > 0:
+                        match_entry["image"] = stored["images"][0]
+                matched_items.append(match_entry)
                 if m.get("confidence", 0) > 50:
                     metadata_match = max(metadata_match, m["confidence"] / 100.0)
 
@@ -306,7 +326,7 @@ async def verify_item(data: VerificationRequest, request: Request):
         # Search in unique_identifiers field
         items = await db.stolen_items.find(
             {"status": "active"},
-            {"_id": 0, "ai_analysis": 0}
+            {"_id": 0}
         ).to_list(1000)
         
         for item in items:
@@ -322,13 +342,25 @@ async def verify_item(data: VerificationRequest, request: Request):
                         contextual_risk = max(contextual_risk, 0.9)
                     else:
                         metadata_match = max(metadata_match, 0.4)
-                    matched_items.append({
+                    match_entry = {
                         "scid": item.get("scid", ""),
                         "title": item.get("title", ""),
                         "category": item.get("category", ""),
+                        "brand": item.get("brand", ""),
+                        "model": item.get("model", ""),
+                        "color": item.get("color", ""),
+                        "description": item.get("description", ""),
+                        "distinguishing_marks": item.get("distinguishing_marks", ""),
+                        "estimated_value": item.get("estimated_value"),
+                        "theft_location": item.get("theft_location", ""),
+                        "theft_date": item.get("theft_date", ""),
+                        "fir_number": item.get("fir_number", ""),
                         "confidence": confidence,
                         "reason": f"{'Exact' if is_exact else 'Partial'} ID match on {key}: {val}",
-                    })
+                    }
+                    if item.get("images") and len(item["images"]) > 0:
+                        match_entry["image"] = item["images"][0]
+                    matched_items.append(match_entry)
         
         ai_analysis = f"ID scan completed. Searched for {id_type}: {id_val}"
 
@@ -339,7 +371,7 @@ async def verify_item(data: VerificationRequest, request: Request):
         if data.category:
             query["category"] = data.category
         
-        items = await db.stolen_items.find(query, {"_id": 0, "ai_analysis": 0}).to_list(1000)
+        items = await db.stolen_items.find(query, {"_id": 0}).to_list(1000)
         
         for item in items:
             score = 0
@@ -349,13 +381,25 @@ async def verify_item(data: VerificationRequest, request: Request):
             if matched_words > 0:
                 score = int((matched_words / len(words)) * 100)
                 metadata_match = max(metadata_match, score / 100.0)
-                matched_items.append({
+                match_entry = {
                     "scid": item.get("scid", ""),
                     "title": item.get("title", ""),
                     "category": item.get("category", ""),
+                    "brand": item.get("brand", ""),
+                    "model": item.get("model", ""),
+                    "color": item.get("color", ""),
+                    "description": item.get("description", ""),
+                    "distinguishing_marks": item.get("distinguishing_marks", ""),
+                    "estimated_value": item.get("estimated_value"),
+                    "theft_location": item.get("theft_location", ""),
+                    "theft_date": item.get("theft_date", ""),
+                    "fir_number": item.get("fir_number", ""),
                     "confidence": score,
                     "reason": f"Text match: {matched_words}/{len(words)} keywords matched",
-                })
+                }
+                if item.get("images") and len(item["images"]) > 0:
+                    match_entry["image"] = item["images"][0]
+                matched_items.append(match_entry)
         
         matched_items.sort(key=lambda x: x["confidence"], reverse=True)
         matched_items = matched_items[:10]
@@ -554,8 +598,28 @@ async def get_all_items(request: Request, category: Optional[str] = None, status
         query["category"] = category
     if status:
         query["status"] = status
+    # Include images in list view (police need to see them)
     items = await db.stolen_items.find(query, {"_id": 0, "ai_analysis": 0}).sort("created_at", -1).to_list(200)
     return items
+
+
+@api_router.get("/law/items/{item_id}")
+async def get_item_for_law(item_id: str, request: Request):
+    """Get full item details including images - for law enforcement."""
+    user = await get_current_user(request, db)
+    if user.get("role") not in ["law_enforcement", "admin"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    item = await db.stolen_items.find_one({"item_id": item_id}, {"_id": 0})
+    if not item:
+        # Also try by SCID
+        item = await db.stolen_items.find_one({"scid": item_id}, {"_id": 0})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    # Also get the reporter's info (masked for privacy)
+    reporter = await db.users.find_one({"user_id": item.get("user_id")}, {"_id": 0, "password_hash": 0})
+    item["reporter_name"] = reporter.get("name", "Unknown") if reporter else "Unknown"
+    item["reporter_email"] = reporter.get("email", "") if reporter else ""
+    return item
 
 
 # =================== ADMIN ROUTES ===================
