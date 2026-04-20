@@ -1,0 +1,66 @@
+# Cloud Run Deployment Configuration for StoleCheck Backend
+# Usage: gcloud run deploy stolecheck-backend --source . --config cloud-run-deploy.yaml
+
+service: stolecheck-backend
+region: us-central1
+platform: managed
+runtime: python312
+
+# Environment variables
+env:
+  - name: GCP_PROJECT_ID
+    value: YOUR_PROJECT_ID
+  - name: GEMINI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: gemini-api-key
+        version: latest
+  - name: GOOGLE_OAUTH_CLIENT_ID
+    value: YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com
+  - name: GOOGLE_OAUTH_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: google-oauth-secret
+        version: latest
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: jwt-secret
+        version: latest
+  - name: GCS_BUCKET_NAME
+    value: stolecheck-images-prod
+  - name: CORS_ORIGINS
+    value: https://YOUR_FRONTEND_URL.com,https://YOUR_FRONTEND_DOMAIN.run.app
+  - name: LOG_LEVEL
+    value: INFO
+  - name: DEPLOYMENT_ENV
+    value: gcp
+
+# Resource configuration
+resources:
+  limits:
+    memory: 512Mi
+    cpu: 1
+
+# Scaling
+autoscaling:
+  minInstances: 1
+  maxInstances: 10
+
+# Timeouts
+timeout: 60s
+
+# Allow unauthenticated access (or set to false and use Cloud IAM)
+allowUnauthenticated: true
+
+# Service Account
+serviceAccount: stolecheck-backend-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
+
+# Ingress
+ingress: all
+
+# Environment-specific settings
+envSecrets:
+  - name: GOOGLE_CLOUD_SERVICE_ACCOUNT_JSON
+    versionRef: latest
+    key: sa-json

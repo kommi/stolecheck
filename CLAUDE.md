@@ -105,27 +105,61 @@ Frontend uses Tailwind CSS with dark tactical theme. Config in `frontend/tailwin
 ## Directory Structure
 ```
 stolecheck/
-├── backend/              # FastAPI application
-│   ├── server.py        # Main API routes
-│   ├── auth.py          # Authentication logic
-│   ├── models.py        # Pydantic models
-│   ├── ai_service.py    # Gemini AI integration
-│   ├── seed_data.py     # Demo data
-│   └── requirements.txt
-├── frontend/            # React application
+├── backend/                        # FastAPI application
+│   ├── server.py                  # Main API routes
+│   ├── auth.py                    # Authentication (JWT, Google OAuth 2.0)
+│   ├── models.py                  # Pydantic models
+│   ├── ai_service.py              # Google Gemini AI integration (2.0-flash)
+│   ├── firestore_client.py        # Firestore database wrapper
+│   ├── gcp_storage.py             # Cloud Storage client
+│   ├── seed_data.py               # Demo data
+│   ├── migrate_from_mongo.py      # MongoDB → Firestore migration script
+│   ├── requirements.txt
+│   └── .env.example               # Environment template
+├── frontend/                       # React application
 │   ├── src/
-│   │   ├── pages/       # Route components
-│   │   ├── components/  # Reusable UI components
-│   │   ├── context/     # State management
-│   │   ├── lib/         # Utilities (API client, helpers)
-│   │   └── hooks/       # Custom React hooks
+│   │   ├── pages/                 # Route components
+│   │   ├── components/            # Reusable UI components
+│   │   ├── context/               # State management (AuthContext)
+│   │   ├── lib/                   # Utilities (API client, helpers)
+│   │   └── hooks/                 # Custom React hooks
 │   ├── public/
+│   ├── Dockerfile                 # Frontend container image
 │   ├── tailwind.config.js
-│   ├── craco.config.js  # Create React App config override
+│   ├── craco.config.js            # Create React App config
 │   └── package.json
-├── tests/               # Frontend test utilities
-├── test_reports/        # Test results
-├── backend_test.py      # Backend integration tests
-├── memory/PRD.md        # Product requirements
+├── tests/                         # Test utilities
+├── test_reports/                  # Test results
+├── Dockerfile                     # Backend container image
+├── cloudbuild.yaml               # Cloud Build CI/CD pipeline
+├── cloud-run-deploy.yaml         # Cloud Run deployment config
+├── DEPLOYMENT_GUIDE.md           # Complete GCP deployment guide
+├── CLAUDE.md                      # This file
+├── backend_test.py               # Backend integration tests
+├── memory/PRD.md                 # Product requirements
 └── design_guidelines.json
 ```
+
+## Google Cloud Deployment
+
+The application is configured for deployment on Google Cloud Platform using:
+- **Google Gemini 2.0 Flash** for AI image analysis
+- **Cloud Run** for serverless backend/frontend hosting
+- **Firestore** for NoSQL database
+- **Cloud Storage** for image management
+- **Secret Manager** for secure credential storage
+- **Cloud Build** for CI/CD automation
+
+### Quick Deployment
+1. Follow `DEPLOYMENT_GUIDE.md` for step-by-step instructions
+2. Set up GCP project with required APIs enabled
+3. Configure OAuth 2.0 credentials in GCP Console
+4. Deploy backend: `gcloud run deploy stolecheck-backend --image gcr.io/PROJECT_ID/stolecheck-backend`
+5. Deploy frontend: `gcloud run deploy stolecheck-frontend --image gcr.io/PROJECT_ID/stolecheck-frontend`
+
+### Key Files for Deployment
+- `Dockerfile` - Backend container definition
+- `frontend/Dockerfile` - Frontend container definition
+- `cloud-run-deploy.yaml` - Cloud Run service configuration
+- `cloudbuild.yaml` - Automated CI/CD pipeline
+- `DEPLOYMENT_GUIDE.md` - Comprehensive deployment documentation
