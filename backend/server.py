@@ -17,7 +17,8 @@ from models import (
 )
 from auth import (
     hash_password, verify_password, create_token,
-    get_current_user, exchange_session_id,
+    get_current_user, verify_google_oauth_token,
+    create_or_update_user, create_session,
 )
 from ai_service import analyze_item_image, compare_images_real, calculate_tps
 
@@ -81,60 +82,30 @@ async def login(data: UserLogin):
 
 @api_router.post("/auth/google-session")
 async def google_session(request: Request, response: Response):
+    """Exchange Google OAuth ID token for a StoleCheck session."""
     body = await request.json()
-    session_id = body.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="session_id required")
-    
-    auth_data = await exchange_session_id(session_id)
+
+    # Support both id_token (new flow) and legacy session_id
+    id_token_str = body.get("id_token") or body.get("credential")
+    if not id_token_str:
+        raise HTTPException(status_code=400, detail="id_token required")
+
+    auth_data = verify_google_oauth_token(id_token_str)
     email = auth_data["email"]
     name = auth_data.get("name", email.split("@")[0])
     picture = auth_data.get("picture")
-    session_token = auth_data.get("session_token", f"sess_{uuid.uuid4().hex}")
 
-    # Find or create user
-    existing = await db.users.find_one({"email": email}, {"_id": 0})
-    if existing:
-        user_id = existing["user_id"]
-        await db.users.update_one(
-            {"email": email},
-            {"$set": {"name": name, "picture": picture}}
-        )
-        role = existing.get("role", "victim")
-        created_at = existing["created_at"]
-    else:
-        user_id = f"user_{uuid.uuid4().hex[:12]}"
-        created_at = datetime.now(timezone.utc).isoformat()
-        role = "victim"
-        await db.users.insert_one({
-            "user_id": user_id,
-            "email": email,
-            "name": name,
-            "role": role,
-            "picture": picture,
-            "created_at": created_at,
-        })
+    user = await create_or_update_user(db, email, name, picture)
+    session_token = await create_session(db, user["user_id"])
 
-    # Store session
-    await db.user_sessions.insert_one({
-        "user_id": user_id,
-        "session_token": session_token,
-        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
-
+    is_local = os.environ.get("DEPLOYMENT_ENV", "local") == "local"
     response.set_cookie(
         key="session_token", value=session_token,
-        httponly=True, secure=True, samesite="none",
+        httponly=True, secure=not is_local,
+        samesite="lax" if is_local else "none",
         path="/", max_age=7 * 24 * 3600,
     )
-    return {
-        "user": {
-            "user_id": user_id, "email": email, "name": name,
-            "role": role, "picture": picture, "created_at": created_at,
-        },
-        "token": session_token,
-    }
+    return {"user": user, "token": session_token}
 
 
 @api_router.get("/auth/me")
@@ -690,6 +661,15 @@ async def update_user_role(user_id: str, request: Request):
 @api_router.get("/")
 async def root():
     return {"message": "StoleCheck API v1.0", "status": "operational"}
+
+
+@api_router.get("/health")
+async def health():
+    try:
+        await db.users.count_documents({})
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": str(e)}
 
 
 @api_router.get("/public/stats")
